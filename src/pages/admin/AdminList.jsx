@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import useUserStore from "../stores/userStore";
+import useUserStore from "../../stores/userStore";
 import axios from "axios";
 import { useNavigate } from "react-router";
 

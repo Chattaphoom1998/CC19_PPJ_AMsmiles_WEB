@@ -50,8 +50,8 @@ function Me() {
 
 	return (
 		<div className=" w-full flex items-center justify-center flex-col bg-none p-0 m-0">
-			<div className="w-full bg-slate-100 p-0 flex flex-col items-center justify-center">
-				<div className="bg-none rounded-lg p-2 w-full">
+			<div className="w-full bg-slate-50 p-0 flex flex-col items-center justify-center">
+				<div className="bg-none rounded p-2 w-full">
 					<div className="space-y-4">
 						<div>
 							<h2 className="text-xl font-normal text-center text-slate-900 mb-1">
@@ -62,21 +62,21 @@ function Me() {
 
 							<div className="mb-2">
 								<span className="text-slate-700">Email:</span>
-								<p className="w-full p-1 mt-1 border border-slate-300 rounded-lg bg-slate-50 text-blue-600">
+								<p className="w-full p-1 mt-1 border border-slate-300 rounded bg-slate-50 text-blue-600">
 									{input.email}
 								</p>
 							</div>
 
 							<div className="mb-1">
 								<span className="text-slate-700">Phone:</span>
-								<p className="w-full p-1 mt-1 border border-slate-300 rounded-lg bg-slate-50">
+								<p className="w-full p-1 mt-1 border border-slate-300 rounded bg-slate-50">
 									{input.phone}
 								</p>
 							</div>
 
 							<div className="mb-0">
 								<span className="text-slate-700">createdAt:</span>
-								<p className="w-full p-1 mt-1 border border-slate-300 rounded-lg bg-slate-50">
+								<p className="w-full p-1 mt-1 border border-slate-300 rounded bg-slate-50 hover:cursor-default">
 									{input.createdAt
 										? new Date(input.createdAt).toLocaleString("en-US", {
 												year: "numeric",
@@ -93,7 +93,7 @@ function Me() {
 
 						<Link
 							to={`/${updatePath}/update/${user.id}`}
-							className="btn h-fit bg-slate-100 border-2 border-green-800 text-green-950 w-full py-1 rounded-lg hover:bg-green-800 hover:text-slate-50"
+							className="btn h-fit bg-slate-100 border-2 border-green-800/[20%] text-green-950 w-full py-1 rounded hover:bg-green-800 hover:text-slate-50"
 						>
 							Edit information
 						</Link>

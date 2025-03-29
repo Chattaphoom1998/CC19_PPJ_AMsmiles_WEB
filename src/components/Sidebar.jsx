@@ -7,7 +7,7 @@ function SidebarMenu() {
 	const [isTreatmentOpen, setIsTreatmentOpen] = useState(true);
 
 	return (
-		<div className="fixed z-30  top-12 h-full  pt-6  w-[260px] bg-slate-100 ">
+		<div className="fixed z-30  top-14 h-full  pt-6  w-[260px] bg-slate-100 ">
 			<ul className="menu w-full  h-full text-[18px]">
 				<li>
 					<details className="w-full" open={isAdminOpen}>

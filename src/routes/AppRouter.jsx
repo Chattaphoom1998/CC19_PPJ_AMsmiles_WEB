@@ -11,12 +11,15 @@ import Home from "../pages/Home";
 import News from "../pages/News";
 import Register from "../pages/Register";
 import SidebarMenu from "../components/Sidebar";
-import Me from "../pages/Me";
-import UpdateAdmin from "../pages/UpdateAdmin";
-import CreateAdmin from "../pages/CreateAdmin";
-import AdminList from "../pages/AdminList";
-import AdminDetail from "../pages/AdminDetail";
-import DeleteAdmin from "../pages/DeleteAdmin";
+import Me from "../components/Me";
+import UpdateAdmin from "../pages/admin/UpdateAdmin";
+import CreateAdmin from "../pages/admin/CreateAdmin";
+import AdminList from "../pages/admin/AdminList";
+import AdminDetail from "../pages/admin/AdminDetail";
+import DeleteAdmin from "../pages/admin/DeleteAdmin";
+import ClinicList from "../pages/clinic/ClinicList";
+import ClinicCreate from "../pages/clinic/ClinicCreate";
+import ClinicEdit from "../pages/clinic/ClinicEdit";
 
 const guestRouter = createBrowserRouter([
 	{
@@ -118,6 +121,15 @@ const adminRouter = createBrowserRouter([
 						],
 					},
 					{ path: "*", element: <Navigate to="/schedule" /> },
+				],
+			},
+			{
+				path: "clinics",
+				children: [
+					{ index: true, element: <ClinicList /> },
+					{ path: "create", element: <ClinicCreate /> },
+					{ path: "edit/:id", element: <ClinicEdit /> },
+					{ path: "*", element: <Navigate to="" /> },
 				],
 			},
 			{ path: "*", element: <Navigate to="/" /> },

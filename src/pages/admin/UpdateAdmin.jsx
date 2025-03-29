@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import useUserStore from "../stores/userStore";
+import useUserStore from "../../stores/userStore";
 import axios from "axios";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { ChevronLeft } from "lucide-react";
 
-function CreateAdmin() {
+function EditProfile() {
 	const initInput = {
 		firstNameEn: "",
 		lastNameEn: "",
@@ -26,30 +27,56 @@ function CreateAdmin() {
 	const [clinics, setClinics] = useState([]);
 	const { user, token } = useUserStore();
 	const navigate = useNavigate();
+	const { id } = useParams();
 
 	useEffect(() => {
-		if (user.role !== "ADMIN") {
-			toast.error("Forbidden. Only admins can create new admins.");
-			return navigate("/account");
-		}
+		const fetchData = async () => {
+			if (!user?.id) return navigate("/login");
+			if (user.role !== "ADMIN" && user.id !== +id) {
+				toast.error("Forbidden. Contact ADMIN.");
+				return navigate("/account");
+			}
 
-		const getClinics = async () => {
 			try {
+				const adminResponse = await axios.get(
+					`http://localhost:8000/admin/${id}`,
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					}
+				);
+				const adminData = adminResponse.data.admin;
+				setInput({
+					firstNameEn: adminData.firstNameEn || "",
+					lastNameEn: adminData.lastNameEn || "",
+					firstNameTh: adminData.firstNameTh || "",
+					lastNameTh: adminData.lastNameTh || "",
+					email: adminData.email || "",
+					phone: adminData.phone || "",
+					idCard: adminData.idCard || "",
+					role: adminData.role?.role || "ADMIN",
+					clinicId: adminData.clinic?.id || null,
+					department: adminData.doctorInfo[0]?.department || "",
+					dentalCouncilRegisId:
+						adminData.doctorInfo[0]?.dentalCouncilRegisId || "",
+					password: "",
+					confirmPassword: "",
+				});
+
 				const clinicsResponse = await axios.get(
 					`http://localhost:8000/clinic`,
 					{
 						headers: { Authorization: `Bearer ${token}` },
 					}
 				);
-				setClinics(clinicsResponse.data || []);
+				setClinics(clinicsResponse.data.clinics || []);
 			} catch (error) {
-				toast.error(error.response?.data?.message || "Failed to load clinics");
+				toast.error(error.response?.data?.message || "Failed to load data");
 			} finally {
 				setLoading(false);
 			}
 		};
-		getClinics();
-	}, [user, token, navigate]);
+		fetchData();
+	}, [user, id, token, navigate]);
 
 	const hdlChange = (e) => {
 		const { name, value } = e.target;
@@ -60,40 +87,9 @@ function CreateAdmin() {
 		}));
 	};
 
-	const hdlCreate = async (e) => {
+	const hdlSave = async (e) => {
 		e.preventDefault();
-		console.log(user?.id);
 		if (!user?.id) return navigate("/login");
-
-		if (
-			!input.firstNameEn.trim() ||
-			!input.lastNameEn.trim() ||
-			!input.firstNameTh.trim() ||
-			!input.lastNameTh.trim() ||
-			!input.email.trim() ||
-			!input.password.trim() ||
-			!input.confirmPassword.trim() ||
-			!input.phone.trim() ||
-			!input.idCard.trim() ||
-			!input.role ||
-			input.clinicId === null
-		) {
-			return toast.error("Please provide all required data.");
-		}
-
-		const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-		if (!emailRegex.test(input.email)) {
-			return toast.error("Please correct your email.");
-		}
-
-		const mobileRegex = /^[0-9]{10,15}$/;
-		if (!mobileRegex.test(input.phone)) {
-			return toast.error("Please correct your phone number.");
-		}
-
-		if (input.password !== input.confirmPassword) {
-			return toast.error("Passwords do not match.");
-		}
 
 		if (
 			input.role === "DOCTOR" &&
@@ -104,14 +100,22 @@ function CreateAdmin() {
 			);
 		}
 
+		if (input.password && input.password !== input.confirmPassword) {
+			return toast.error("Passwords do not match");
+		}
+
 		const payload = {
 			...input,
-			clinicId: input.clinicId,
+			clinicId:
+				input.clinicId === "" || input.clinicId === null
+					? null
+					: parseInt(input.clinicId),
 		};
+		delete payload.confirmPassword;
 
 		try {
-			const { data } = await axios.post(
-				`http://localhost:8000/admin/create`,
+			const { data } = await axios.patch(
+				`http://localhost:8000/admin/update/${id}`,
 				payload,
 				{
 					headers: {
@@ -120,11 +124,13 @@ function CreateAdmin() {
 					},
 				}
 			);
-			toast.success("Admin created successfully");
-			navigate("/admin");
-			useUserStore.setState({ user: data.admin });
+			toast.success("Profile updated");
+			navigate("account");
+			if (+id === user.id) {
+				useUserStore.setState({ user: data.admin });
+			}
 		} catch (error) {
-			toast.error(error.response?.data?.message || "Failed to create admin");
+			toast.error(error.response?.data?.message || "Update failed");
 		}
 	};
 
@@ -137,7 +143,16 @@ function CreateAdmin() {
 
 	return (
 		<div className="min-h-screen w-full flex items-center justify-center bg-slate-50">
-			<div className="w-full p-6 flex items-center justify-evenly gap-20">
+			<div className=" fixed left-75 top-25 z-30">
+				<button
+					type="button"
+					onClick={() => navigate(-1)}
+					className="flex items-center border-1 rounded-full w-auto aspect-square p-2 text-slate-400 hover:text-green-800 hover:cursor-pointer"
+				>
+					<ChevronLeft size={20} />
+				</button>
+			</div>
+			<div className="w-full p-6 flex  items-center justify-evenly gap-20">
 				<div className="card bg-slate-100 w-96 shadow-sm">
 					<figure>
 						<div className="w-100 h-100 bg-slate-200 rounded-lg flex items-center justify-center mb-4">
@@ -148,13 +163,15 @@ function CreateAdmin() {
 					</figure>
 					<div className="card-body">
 						<h2 className="card-title text-2xl font-medium justify-center text-slate-950">
-							{`${input.firstNameEn || "New"} ${input.lastNameEn || "Admin"}`}
+							{`${input.firstNameEn || "undefined"} ${
+								input.lastNameEn || "undefined"
+							}`}
 						</h2>
 					</div>
 				</div>
 
 				<div className="bg-white p-6 rounded-lg shadow-md w-[700px]">
-					<form onSubmit={hdlCreate} className="space-y-4">
+					<form onSubmit={hdlSave} className="space-y-4">
 						<div className="flex gap-2">
 							<label className="w-1/2">
 								<span className="text-slate-700">First Name (Eng):</span>
@@ -164,7 +181,6 @@ function CreateAdmin() {
 									value={input.firstNameEn}
 									onChange={hdlChange}
 									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-									required
 								/>
 							</label>
 							<label className="w-1/2">
@@ -175,7 +191,6 @@ function CreateAdmin() {
 									value={input.lastNameEn}
 									onChange={hdlChange}
 									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-									required
 								/>
 							</label>
 						</div>
@@ -187,9 +202,8 @@ function CreateAdmin() {
 									type="email"
 									name="email"
 									value={input.email}
-									onChange={hdlChange}
-									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-									required
+									disabled
+									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-200 text-slate-500"
 								/>
 							</label>
 							<label className="w-1/2">
@@ -200,7 +214,6 @@ function CreateAdmin() {
 									value={input.phone}
 									onChange={hdlChange}
 									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-									required
 								/>
 							</label>
 						</div>
@@ -214,7 +227,6 @@ function CreateAdmin() {
 									value={input.firstNameTh}
 									onChange={hdlChange}
 									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-									required
 								/>
 							</label>
 							<label className="w-1/2">
@@ -225,7 +237,6 @@ function CreateAdmin() {
 									value={input.lastNameTh}
 									onChange={hdlChange}
 									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-									required
 								/>
 							</label>
 						</div>
@@ -239,7 +250,6 @@ function CreateAdmin() {
 									value={input.idCard}
 									onChange={hdlChange}
 									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-									required
 								/>
 							</label>
 							<label className="w-1/2">
@@ -249,7 +259,6 @@ function CreateAdmin() {
 									value={input.role}
 									onChange={hdlChange}
 									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-									required
 								>
 									<option value="ADMIN">Admin</option>
 									<option value="DOCTOR">Doctor</option>
@@ -258,13 +267,12 @@ function CreateAdmin() {
 						</div>
 
 						<label className="block">
-							<span className="text-slate-700">Clinic ID:</span>
+							<span className="text-slate-700">Clinic:</span>
 							<select
 								name="clinicId"
 								value={input.clinicId || ""}
 								onChange={hdlChange}
 								className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-								required
 							>
 								<option value="">Select Clinic</option>
 								{clinics.map((clinic) => (
@@ -285,7 +293,6 @@ function CreateAdmin() {
 										value={input.department}
 										onChange={hdlChange}
 										className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-										required
 									/>
 								</label>
 								<label className="w-1/2">
@@ -298,7 +305,6 @@ function CreateAdmin() {
 										value={input.dentalCouncilRegisId}
 										onChange={hdlChange}
 										className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-										required
 									/>
 								</label>
 							</div>
@@ -314,8 +320,7 @@ function CreateAdmin() {
 								value={input.password}
 								onChange={hdlChange}
 								className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-								placeholder="Enter password"
-								required
+								placeholder="Leave blank to keep current"
 							/>
 						</label>
 
@@ -329,8 +334,7 @@ function CreateAdmin() {
 								value={input.confirmPassword}
 								onChange={hdlChange}
 								className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
-								placeholder="Confirm your password"
-								required
+								placeholder="Confirm your new password"
 							/>
 						</label>
 
@@ -338,7 +342,7 @@ function CreateAdmin() {
 							type="submit"
 							className="btn bg-green-800 text-slate-50 w-full py-3 rounded-lg hover:bg-green-600"
 						>
-							Create
+							Save
 						</button>
 					</form>
 				</div>
@@ -347,4 +351,4 @@ function CreateAdmin() {
 	);
 }
 
-export default CreateAdmin;
+export default EditProfile;

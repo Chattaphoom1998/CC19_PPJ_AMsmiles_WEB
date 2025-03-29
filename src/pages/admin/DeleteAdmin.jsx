@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import useUserStore from "../stores/userStore";
+import useUserStore from "../../stores/userStore";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router";
 
-function AdminDetail() {
+function DeleteAdmin() {
 	const initInput = {
 		id: "",
 		firstNameEn: "",
@@ -28,9 +28,8 @@ function AdminDetail() {
 	const { id } = useParams();
 
 	useEffect(() => {
-		if (!user?.id) return navigate("/login");
 		if (user.role !== "ADMIN") {
-			toast.error("Forbidden. Only admins can view admin details.");
+			toast.error("Forbidden. Only admins can delete admins.");
 			return navigate("/admin");
 		}
 
@@ -75,6 +74,22 @@ function AdminDetail() {
 		fetchData();
 	}, [user, id, token, navigate]);
 
+	const hdlDelete = async () => {
+		if (!user?.id) return navigate("/login");
+
+		try {
+			await axios.delete(`http://localhost:8000/admin/delete/${id}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+			toast.success("Admin deleted successfully");
+			navigate("/admin");
+		} catch (error) {
+			toast.error(error.response?.data?.message || "Failed to delete admin");
+		}
+	};
+
 	if (loading)
 		return (
 			<div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -106,7 +121,7 @@ function AdminDetail() {
 					<div className="space-y-4">
 						<div>
 							<h3 className="text-lg font-semibold text-slate-800 mb-2">
-								Info:
+								Confirm Deletion
 							</h3>
 							<hr className="border-slate-300 mb-4" />
 							<p className="text-slate-700">
@@ -146,18 +161,22 @@ function AdminDetail() {
 							</p>
 						</div>
 
-						<div className="flex gap-4 justify-end">
+						<div>
+							<p className="text-red-600 text-sm mb-4">
+								Are you sure you want to delete this admin? This action cannot
+								be undone.
+							</p>
 							<button
-								onClick={() => navigate(`/admin/update/${id}`)}
-								className="btn bg-green-800 text-slate-50  py-3 rounded-lg hover:bg-green-700"
-							>
-								Update
-							</button>
-							<button
-								onClick={() => navigate(`/admin/delete/${id}`)}
-								className="btn border-2 border-slate-600 text-slate-600  py-3 rounded-lg hover:text-red-600 hover:border-red-600 hover:bg-slate-200"
+								onClick={hdlDelete}
+								className="btn bg-red-600 text-slate-50 w-full py-3 rounded-lg hover:bg-red-500"
 							>
 								Delete
+							</button>
+							<button
+								onClick={() => navigate(`/admin/${id}`)}
+								className="btn bg-slate-300 text-slate-700 w-full py-3 rounded-lg mt-2 hover:bg-slate-400"
+							>
+								Cancel
 							</button>
 						</div>
 					</div>
@@ -167,4 +186,4 @@ function AdminDetail() {
 	);
 }
 
-export default AdminDetail;
+export default DeleteAdmin;
