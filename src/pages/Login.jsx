@@ -39,7 +39,7 @@ function Login() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center flex-col bg-slate-50 w-screen">
+		<div className="min-h-screen flex items-center flex-col bg-slate-50 w-screen">
 			<div className="w-full max-w-md p-6 flex flex-col items-center justify-center">
 				<div className="mb-6 bg">
 					<h2 className="text-3xl font-bold text-center text-slate-950">

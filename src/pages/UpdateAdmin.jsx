@@ -28,11 +28,8 @@ function EditProfile() {
 	const navigate = useNavigate();
 	const { id } = useParams();
 
-	console.log(user);
-
 	useEffect(() => {
 		const fetchData = async () => {
-			console.log({ test2: user });
 			if (!user?.id) return navigate("/login");
 			if (user.role !== "ADMIN" && user.id !== +id) {
 				toast.error("Forbidden. Contact ADMIN.");
@@ -57,12 +54,9 @@ function EditProfile() {
 					idCard: adminData.idCard || "",
 					role: adminData.role?.role || "ADMIN",
 					clinicId: adminData.clinic?.id || null,
-					department: adminData.doctorInfo?.length
-						? adminData.doctorInfo[0]?.department || ""
-						: "",
-					dentalCouncilRegisId: adminData.doctorInfo?.length
-						? adminData.doctorInfo[0]?.dentalCouncilRegisId || ""
-						: "",
+					department: adminData.doctorInfo?.department || "",
+					dentalCouncilRegisId:
+						adminData.doctorInfo?.dentalCouncilRegisId || "",
 					password: "",
 					confirmPassword: "",
 				});
@@ -94,7 +88,6 @@ function EditProfile() {
 
 	const hdlSave = async (e) => {
 		e.preventDefault();
-		console.log({ test: user });
 		if (!user?.id) return navigate("/login");
 
 		if (
@@ -130,10 +123,11 @@ function EditProfile() {
 					},
 				}
 			);
-			console.log(data);
 			toast.success("Profile updated");
 			navigate("/account");
-			useUserStore.setState({ user: data.admin });
+			if (+id === user.id) {
+				useUserStore.setState({ user: data.admin });
+			}
 		} catch (error) {
 			toast.error(error.response?.data?.message || "Update failed");
 		}
@@ -159,7 +153,7 @@ function EditProfile() {
 					</figure>
 					<div className="card-body">
 						<h2 className="card-title text-2xl font-medium justify-center text-slate-950">
-							{`${input.firstNameEn || "undefined"}   ${
+							{`${input.firstNameEn || "undefined"} ${
 								input.lastNameEn || "undefined"
 							}`}
 						</h2>
@@ -198,9 +192,8 @@ function EditProfile() {
 									type="email"
 									name="email"
 									value={input.email}
-									onChange={hdlChange}
-									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-50 text-slate-900"
 									disabled
+									className="w-full p-2 mt-1 border border-slate-300 rounded-md bg-slate-200 text-slate-500"
 								/>
 							</label>
 							<label className="w-1/2">
@@ -264,7 +257,7 @@ function EditProfile() {
 						</div>
 
 						<label className="block">
-							<span className="text-slate-700">Clinic ID:</span>
+							<span className="text-slate-700">Clinic:</span>
 							<select
 								name="clinicId"
 								value={input.clinicId || ""}

@@ -40,8 +40,6 @@ function Me() {
 			} catch (error) {
 				const errMsg = error.response?.data?.message || error.message;
 				toast.error(errMsg || "Failed to load profile data");
-			} finally {
-				setLoading(false);
 			}
 		};
 

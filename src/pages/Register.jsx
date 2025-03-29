@@ -68,8 +68,8 @@ function Register() {
 	};
 
 	return (
-		<div className="min-h-screen w-screen flex items-center justify-center flex-col bg-slate-50">
-			<div className="w-full max-w-md p-6 flex flex-col items-center justify-center">
+		<div className="min-h-screen w-screen flex items-center flex-col bg-slate-50">
+			<div className="w-full max-w-md p-6 flex flex-col items-center justify-center ">
 				<div className="mb-6">
 					<h2 className="text-3xl font-bold text-center text-slate-950">
 						Create an account

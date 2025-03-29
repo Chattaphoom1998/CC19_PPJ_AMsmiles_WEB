@@ -10,12 +10,12 @@ function App() {
 	const dpHeader = user?.role ? <Header /> : <HeaderGuest />;
 	const dpSidebar = user?.role === "ADMIN" ? <SidebarMenu /> : "";
 	return (
-		<div className="bg-slate-50">
-			{dpHeader}
-			<div className="flex items-center justify-between h-screen ">
+		<div className="bg-slate-50 min-h-screen">
+			<div>{dpHeader}</div>
+			<div className="flex items-center justify-between min-h-screen bg-slate-50 ">
 				<div className="w-[260px] ">{dpSidebar}</div>
-				<div className=" flex flex-1 justify-center">
-					<main className=" relative flex flex-1 gap-2  pt-14 ">
+				<div className=" flex flex-1 min-h-screen justify-center bg-slate-50">
+					<main className="flex flex-1 gap-2 min-h-screen  pt-14 bg-slate-50">
 						<Outlet />
 					</main>
 				</div>

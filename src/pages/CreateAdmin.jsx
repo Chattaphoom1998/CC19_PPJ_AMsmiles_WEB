@@ -62,6 +62,7 @@ function CreateAdmin() {
 
 	const hdlCreate = async (e) => {
 		e.preventDefault();
+		console.log(user?.id);
 		if (!user?.id) return navigate("/login");
 
 		if (
