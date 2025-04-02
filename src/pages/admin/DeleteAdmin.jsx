@@ -64,7 +64,7 @@ function DeleteAdmin() {
 						headers: { Authorization: `Bearer ${token}` },
 					}
 				);
-				setClinics(clinicsResponse.data || []);
+				setClinics(clinicsResponse.data.clinics || []);
 			} catch (error) {
 				toast.error(error.response?.data?.message || "Failed to load data");
 			} finally {

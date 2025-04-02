@@ -30,7 +30,7 @@ function AdminDetail() {
 
 	useEffect(() => {
 		if (!user?.id) return navigate("/login");
-		if (user.role !== "ADMIN") {
+		if (user.role === "USER") {
 			toast.error("Forbidden. Only admins can view admin details.");
 			return navigate("/admin");
 		}

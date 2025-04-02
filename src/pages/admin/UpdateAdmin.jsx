@@ -126,9 +126,9 @@ function EditProfile() {
 			);
 			toast.success("Profile updated");
 			navigate("account");
-			if (+id === user.id) {
-				useUserStore.setState({ user: data.admin });
-			}
+			// if (+id === user.id) {
+			// 	useUserStore.setState({ user: data.admin });
+			// }
 		} catch (error) {
 			toast.error(error.response?.data?.message || "Update failed");
 		}

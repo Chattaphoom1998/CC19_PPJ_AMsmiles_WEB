@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import useUserStore from "../stores/userStore";
 import { AmSmilesLogo, LocationIcon } from "../icons";
 import Avatar from "./Avatar";
@@ -8,12 +8,18 @@ import Me from "../components/Me";
 function Header() {
 	const logout = useUserStore((state) => state.logout);
 	const user = useUserStore((state) => state.user);
+	const navigate = useNavigate();
 
 	const path = user.role === "USER" ? "user" : "admin";
 
 	return (
 		<header className="flex justify-between items-center px-4 h-14 w-full bg-green-900 text-slate-50 fixed top-0 z-10 shadow-md">
-			<div className="flex flex-1 items-center pl-15 h-full">
+			<div
+				className="flex flex-1 items-center pl-15 h-full hover:cursor-pointer"
+				onClick={() => {
+					navigate("/");
+				}}
+			>
 				<AmSmilesLogo className="w-18 h-full" />
 			</div>
 

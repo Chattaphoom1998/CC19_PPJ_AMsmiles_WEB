@@ -8,7 +8,7 @@ import useUserStore from "../../stores/userStore";
 import { Pencil, Trash2, Plus } from "lucide-react";
 
 function ClinicList() {
-	const { token } = useUserStore();
+	const { token, user } = useUserStore();
 	const [clinics, setClinics] = useState([]);
 	const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 	const navigate = useNavigate();
@@ -49,12 +49,16 @@ function ClinicList() {
 		<div className="min-h-screen p-6 bg-slate-50 mx-auto">
 			<div className="flex justify-between items-center mb-6">
 				<h1 className="text-2xl font-bold">Clinic List</h1>
-				<button
-					onClick={() => navigate("create")}
-					className="btn flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded hover:bg-green-700"
-				>
-					<Plus size={18} /> Add Clinic
-				</button>
+				{user.role === "ADMIN" ? (
+					<button
+						onClick={() => navigate("create")}
+						className="btn flex items-center gap-2 bg-green-800 text-white px-4 py-2 rounded hover:bg-green-700"
+					>
+						<Plus size={18} /> Add Clinic
+					</button>
+				) : (
+					""
+				)}
 			</div>
 
 			<div className="bg-white shadow rounded overflow-hidden">
@@ -81,20 +85,24 @@ function ClinicList() {
 								<td className="p-3  text-center">
 									{new Date(clinic.updatedAt).toLocaleDateString()}
 								</td>
-								<td className=" p-3 flex justify-center items-center">
-									<button
-										onClick={() => navigate(`edit/${clinic.id}`)}
-										className="btn border-none bg-transparent shadow-none hover:shadow-none text-slate-400 hover:text-green-800"
-									>
-										<Pencil size={18} />
-									</button>
-									<button
-										onClick={() => setConfirmDeleteId(clinic.id)}
-										className="btn border-none bg-transparent shadow-none hover:shadow-none text-slate-400 hover:text-red-800"
-									>
-										<Trash2 size={20} />
-									</button>
-								</td>
+								{user.role === "ADMIN" ? (
+									<td className=" p-3 flex justify-center items-center">
+										<button
+											onClick={() => navigate(`edit/${clinic.id}`)}
+											className="btn border-none bg-transparent shadow-none hover:shadow-none text-slate-400 hover:text-green-800"
+										>
+											<Pencil size={18} />
+										</button>
+										<button
+											onClick={() => setConfirmDeleteId(clinic.id)}
+											className="btn border-none bg-transparent shadow-none hover:shadow-none text-slate-400 hover:text-red-800"
+										>
+											<Trash2 size={20} />
+										</button>
+									</td>
+								) : (
+									""
+								)}
 							</tr>
 						))}
 						{clinics.length === 0 && (

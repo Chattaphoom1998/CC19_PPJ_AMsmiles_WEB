@@ -13,7 +13,7 @@ function AdminList() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (user.role !== "ADMIN") {
+		if (user.role === "USER") {
 			toast.error("Forbidden. Only admins can view admin list.");
 			return navigate("/account");
 		}
@@ -64,13 +64,13 @@ function AdminList() {
 	return (
 		<div className="min-h-screen w-full flex flex-col  items-center bg-slate-50 ">
 			<div className="w-full px-6">
-				<div className="flex justify-center w-full max-w-lg mx-auto my-6 sticky top-16 z-10  rounded-lg">
+				<div className="flex justify-center w-full max-w-lg mx-auto my-6 fixed top-14 left-100 right-100 z-10  rounded-lg">
 					<input
 						type="text"
 						value={searchQuery}
 						onChange={hdlSearch}
 						placeholder="Search by name, phone, or email..."
-						className="w-full max-w-md p-2 border shadow-md  border-slate-300 rounded-md bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-800"
+						className="input input-bordered w-full max-w-sm"
 					/>
 				</div>
 				<h1 className="text-2xl font-bold text-slate-900 mb-12 ">

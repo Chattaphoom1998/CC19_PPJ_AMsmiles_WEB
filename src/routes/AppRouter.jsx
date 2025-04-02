@@ -20,6 +20,18 @@ import DeleteAdmin from "../pages/admin/DeleteAdmin";
 import ClinicList from "../pages/clinic/ClinicList";
 import ClinicCreate from "../pages/clinic/ClinicCreate";
 import ClinicEdit from "../pages/clinic/ClinicEdit";
+import ScheduleList from "../pages/appointment/ScheduleCardList";
+import ScheduleDetail from "../pages/appointment/ScheduleDetail";
+import CreateService from "../pages/appointment/CreateService";
+import UpdateService from "../pages/appointment/UpdateService";
+import CreateSchedule from "../pages/appointment/CreateSchedule";
+import UpdateSchedule from "../pages/appointment/UpdateSchedule";
+import CalendarView from "../pages/CalendarView";
+import UserList from "../pages/user/UserList";
+import UserDetail from "../pages/user/UserDetail";
+import UpdateUser from "../pages/user/UpdateUser";
+import CreateUser from "../pages/user/CreateUser";
+import DeleteUser from "../pages/user/DeleteUser";
 
 const guestRouter = createBrowserRouter([
 	{
@@ -42,33 +54,79 @@ const userRouter = createBrowserRouter([
 		children: [
 			{ index: true, element: <Home /> },
 			{ path: "/news", element: <News /> },
-			{ path: "/me", element: <p>me</p> },
+			{ path: "user/:id", element: <UserDetail /> },
+			{ path: `/user/update/:id`, element: <UpdateUser /> },
+			{ path: "/schedule", element: <ScheduleList /> },
+			{ path: "/schedule/:id", element: <ScheduleDetail /> },
+			{ path: "/schedule/:id/service/update/:id", element: <UpdateService /> },
 		],
 	},
-	{ path: "/user/update/:id", element: <p>update me</p> },
-	{ path: "/schedule/list", element: <p>schedule-list</p> },
-	{ path: "/schedule/:id", element: <p>a schedule</p> },
-	{ path: "/service/:id", element: <p>a service</p> },
-	{ path: "/service/update/:id", element: <p>service time update</p> },
 	{ path: "*", element: <Navigate to="/" /> },
 ]);
 
 const doctorRouter = createBrowserRouter([
-	{ path: "/", element: <p>home</p> },
-	{ path: "/news", element: <p>news</p> },
-	{ path: "/me", element: <p>me</p> },
-	{ path: "/admin/update/:id", element: <p>update me</p> },
-	{ path: "/admin/list", element: <p>admin list</p> },
-	{ path: "/admin/:id", element: <p>a admin</p> },
-	{ path: "/user/list", element: <p>user list</p> },
-	{ path: "/user/:id", element: <p>a user</p> },
-	{ path: "/schedule/list", element: <p>schedule-list</p> },
-	{ path: "/schedule/:id", element: <p>a schedule</p> },
-	{ path: "/service/:id", element: <p>a service</p> },
-	{ path: "/service/create", element: <p>create service</p> },
-	{ path: "/service/update/:id", element: <p>service update</p> },
-	{ path: "/service/delete/:id", element: <p>delete own service update</p> },
-	{ path: "*", element: <Navigate to="/" /> },
+	{
+		path: "/",
+		element: <App />,
+
+		children: [
+			{ index: true, element: <Home /> },
+			{ path: "news", element: <News /> },
+			{
+				path: "admin",
+				children: [
+					{ index: true, element: <AdminList /> },
+					{ path: "create", element: <Navigate to="/admin" replace /> },
+					{ path: "update/:id", element: <UpdateAdmin /> },
+					{ path: ":id", element: <AdminDetail /> },
+					{ path: "*", element: <Navigate to="/admin" /> },
+				],
+			},
+			{
+				path: "user",
+				children: [
+					{ index: true, element: <UserList /> },
+					{ path: "create", element: <Navigate to="/user" replace /> },
+					{ path: ":id", element: <UserDetail /> },
+					{ path: "*", element: <Navigate to="/user" /> },
+				],
+			},
+			{
+				path: "schedule",
+				children: [
+					{ index: true, element: <ScheduleList /> },
+					{
+						path: ":id",
+						children: [
+							{ index: true, element: <ScheduleDetail /> },
+							{
+								path: "service",
+								children: [
+									{ path: "create", element: <CreateService /> },
+									{ path: "update/:id", element: <UpdateService /> },
+									{ path: "*", element: <Navigate to="/schedule/service" /> },
+								],
+							},
+						],
+					},
+					{ path: "create", element: <CreateSchedule /> },
+					{ path: "update/:id", element: <UpdateSchedule /> },
+					{ path: "*", element: <Navigate to="/schedule" /> },
+				],
+			},
+			{
+				path: "clinics",
+				children: [
+					{ index: true, element: <ClinicList /> },
+					{ path: "create", element: <ClinicCreate /> },
+					{ path: "edit/:id", element: <ClinicEdit /> },
+					{ path: "*", element: <Navigate to="" /> },
+				],
+			},
+			{ path: "calendar", element: <CalendarView /> },
+			{ path: "*", element: <Navigate to="/" /> },
+		],
+	},
 ]);
 
 const adminRouter = createBrowserRouter([
@@ -79,7 +137,6 @@ const adminRouter = createBrowserRouter([
 		children: [
 			{ index: true, element: <Home /> },
 			{ path: "news", element: <News /> },
-			{ path: "me", element: <Me /> },
 			{
 				path: "admin",
 				children: [
@@ -94,32 +151,37 @@ const adminRouter = createBrowserRouter([
 			{
 				path: "user",
 				children: [
-					{ index: true, element: <p>user list</p> },
-					{ path: ":id", element: <p>a user</p> },
-					{ path: "create", element: <p>create user</p> },
-					{ path: "update/:id", element: <p>update a user</p> },
-					{ path: "delete/:id", element: <p>delete a user</p> },
+					{ index: true, element: <UserList /> },
+					{ path: ":id", element: <UserDetail /> },
+					{ path: "create", element: <CreateUser /> },
+					{ path: "update/:id", element: <UpdateUser /> },
+					{ path: "delete/:id", element: <DeleteUser /> },
 					{ path: "*", element: <Navigate to="/user" /> },
 				],
 			},
 			{
 				path: "schedule",
 				children: [
-					{ index: true, element: <p>schedule-list</p> },
-					{ path: ":id", element: <p>a schedule</p> },
-					{ path: "create", element: <p>create schedule</p> },
-					{ path: "update/:id", element: <p>update schedule</p> },
-					{ path: "delete/:id", element: <p>delete schedule</p> },
+					{ index: true, element: <ScheduleList /> },
 					{
-						path: "service",
+						path: ":id",
 						children: [
-							{ path: ":id", element: <p>a service</p> },
-							{ path: "update/:id", element: <p>service update</p> },
-							{ path: "delete/:id", element: <p>delete own service</p> },
-							{ path: "create", element: <p>create service</p> },
-							{ path: "*", element: <Navigate to="/schedule/service" /> },
+							{ index: true, element: <ScheduleDetail /> },
+							{
+								path: "service",
+								children: [
+									{ path: "create", element: <CreateService /> },
+									{ path: "update/:id", element: <UpdateService /> },
+									// { path: "delete/:id", element: <p>delete own service</p> },
+									// { path: ":id", element: <p>a service</p> },
+									{ path: "*", element: <Navigate to="/schedule/service" /> },
+								],
+							},
 						],
 					},
+					{ path: "create", element: <CreateSchedule /> },
+					{ path: "update/:id", element: <UpdateSchedule /> },
+					// { path: "delete/:id", element: <p>delete schedule</p> },
 					{ path: "*", element: <Navigate to="/schedule" /> },
 				],
 			},
@@ -132,6 +194,7 @@ const adminRouter = createBrowserRouter([
 					{ path: "*", element: <Navigate to="" /> },
 				],
 			},
+			{ path: "calendar", element: <CalendarView /> },
 			{ path: "*", element: <Navigate to="/" /> },
 		],
 	},
